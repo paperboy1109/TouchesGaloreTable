@@ -16,6 +16,7 @@
 		4E44720D1D8223F300C87732 /* TableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E44720C1D8223F300C87732 /* TableItem.swift */; };
 		4E4472101D826F5D00C87732 /* SampleDataGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E44720F1D826F5D00C87732 /* SampleDataGenerator.swift */; };
 		4E4472131D83092100C87732 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4472121D83092100C87732 /* CustomTableViewCell.swift */; };
+		4E4472221D83716E00C87732 /* StrikethroughText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4472211D83716D00C87732 /* StrikethroughText.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		4E44720C1D8223F300C87732 /* TableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableItem.swift; sourceTree = "<group>"; };
 		4E44720F1D826F5D00C87732 /* SampleDataGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleDataGenerator.swift; sourceTree = "<group>"; };
 		4E4472121D83092100C87732 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		4E4472211D83716D00C87732 /* StrikethroughText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrikethroughText.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				4E4472121D83092100C87732 /* CustomTableViewCell.swift */,
+				4E4472211D83716D00C87732 /* StrikethroughText.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -180,6 +183,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E4472221D83716E00C87732 /* StrikethroughText.swift in Sources */,
 				4E4472131D83092100C87732 /* CustomTableViewCell.swift in Sources */,
 				4E4471F91D8222A800C87732 /* ViewController.swift in Sources */,
 				4E44720D1D8223F300C87732 /* TableItem.swift in Sources */,

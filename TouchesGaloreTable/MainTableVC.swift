@@ -67,9 +67,12 @@ extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! CustomTableViewCell
         
-        cell.textLabel?.backgroundColor = UIColor.clearColor()
+        // cell.textLabel?.backgroundColor = UIColor.clearColor() -- This is accomplished using the StrikethroughText class
         
-        cell.textLabel!.text = exampleData[indexPath.row].cellText
+        // cell.textLabel!.text = exampleData[indexPath.row].cellText -- This is accomplished by using a didSet observer on CustomTableViewCell's toDoItem property.
+        
+        cell.delegate = self
+        cell.toDoItem = exampleData[indexPath.row]
         
         return cell
     }
@@ -85,6 +88,26 @@ extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         cell.backgroundColor = colorForCellByIndex(indexPath.row) // UIColor.clearColor()
     }
+
     
+    
+}
+
+extension MainTableVC: TableViewCellDelegate {
+    
+    /* Delete a cell */
+    func toDoItemDeleted(toDoItem: TableItem) {
+        let index = (exampleData as NSArray).indexOfObject(toDoItem)
+        if index == NSNotFound { return }
+        
+        /* Delete the item from the exampleData array */
+        exampleData.removeAtIndex(index)
+        
+        /* Delete the corresponding cell from the table view */
+        tableView.beginUpdates()
+        let indexPathForRow = NSIndexPath(forRow: index, inSection: 0)
+        tableView.deleteRowsAtIndexPaths([indexPathForRow], withRowAnimation: .Left)//.Fade)
+        tableView.endUpdates()
+    }
     
 }
