@@ -10,6 +10,10 @@ import UIKit
 
 class MainTableVC: UIViewController {
     
+    // MARK: - Properties
+    
+    var exampleData: [TableItem]!
+    
     // MARK: - Outlets
 
     @IBOutlet var tableView: UITableView!
@@ -18,8 +22,11 @@ class MainTableVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.dataSource = self
+        tableView.delegate = self
 
-        // Do any additional setup after loading the view.
+        exampleData = SampleDataGenerator.createSampleData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -38,4 +45,25 @@ class MainTableVC: UIViewController {
     }
     */
 
+}
+
+
+extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return exampleData.count
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        
+        cell.textLabel!.text = exampleData[indexPath.row].cellText
+        
+        return cell
+    }
 }
