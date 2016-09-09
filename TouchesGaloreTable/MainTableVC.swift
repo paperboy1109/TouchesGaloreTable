@@ -25,6 +25,11 @@ class MainTableVC: UIViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.registerClass(CustomTableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.separatorStyle = .None
+        tableView.rowHeight = 64.0 //49.0
+        tableView.backgroundColor = UIColor.blackColor()
+        
 
         exampleData = SampleDataGenerator.createSampleData()
     }
@@ -60,10 +65,26 @@ extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! CustomTableViewCell
+        
+        cell.textLabel?.backgroundColor = UIColor.clearColor()
         
         cell.textLabel!.text = exampleData[indexPath.row].cellText
         
         return cell
     }
+    
+    /* Add color */
+    func colorForCellByIndex(index: Int) -> UIColor {
+        let cellCount = exampleData.count - 1
+        let variableGreen = (CGFloat(index) / CGFloat(cellCount)) * 0.6
+        
+        return UIColor(red: 1.0, green: variableGreen, blue: 0.0, alpha: 0.85)
+    }
+    
+    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+        cell.backgroundColor = colorForCellByIndex(indexPath.row) // UIColor.clearColor()
+    }
+    
+    
 }
