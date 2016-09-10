@@ -15,7 +15,7 @@ class MainTableVC: UIViewController {
     var exampleData: [TableItem]!
     
     // MARK: - Outlets
-
+    
     @IBOutlet var tableView: UITableView!
     
     // MARK: - Lifecycle
@@ -30,26 +30,26 @@ class MainTableVC: UIViewController {
         tableView.rowHeight = 64.0 //49.0
         tableView.backgroundColor = UIColor.blackColor()
         
-
+        
         exampleData = SampleDataGenerator.createSampleData()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }
 
 
@@ -88,7 +88,7 @@ extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         cell.backgroundColor = colorForCellByIndex(indexPath.row) // UIColor.clearColor()
     }
-
+    
     
     
 }
@@ -97,17 +97,73 @@ extension MainTableVC: TableViewCellDelegate {
     
     /* Delete a cell */
     func toDoItemDeleted(toDoItem: TableItem) {
+        
+        /* Delete using stock animations */
+        //        let index = (exampleData as NSArray).indexOfObject(toDoItem)
+        //        if index == NSNotFound { return }
+        //
+        //        /* Delete the item from the exampleData array */
+        //        exampleData.removeAtIndex(index)
+        //
+        //        /* Delete the corresponding cell from the table view */
+        //        tableView.beginUpdates()
+        //        let indexPathForRow = NSIndexPath(forRow: index, inSection: 0)
+        //        tableView.deleteRowsAtIndexPaths([indexPathForRow], withRowAnimation: .Left)//.Fade)
+        //        tableView.endUpdates()
+        
+        
+        /* Delete a cell, making the cells below it "shuffle" upwards */
+        
         let index = (exampleData as NSArray).indexOfObject(toDoItem)
         if index == NSNotFound { return }
         
-        /* Delete the item from the exampleData array */
+        // could removeAtIndex in the loop but keep it here for when indexOfObject works
         exampleData.removeAtIndex(index)
         
-        /* Delete the corresponding cell from the table view */
+        let visibleCells = tableView.visibleCells as! [CustomTableViewCell]
+        
+        /* Kepp track of the last cell */
+        let lastView = visibleCells[visibleCells.count - 1] as CustomTableViewCell
+        
+        var delay = 0.0
+        var startAnimating = false
+        
+        for i in 0..<visibleCells.count {
+            
+            let cell = visibleCells[i]
+            
+            if startAnimating {
+                
+                UIView.animateWithDuration(0.3, delay: delay, options: .CurveEaseInOut,
+                                           
+                                           animations: {() in
+                                            
+                                            /* Move the cell up by the distance of a single cell (fills space of the deleted cell)*/
+                                            cell.frame = CGRectOffset(cell.frame, 0.0, -cell.frame.size.height)},
+                                           
+                                           /* Once the animation has been applied to all cells, reload the data */
+                                           completion: {(finished: Bool) in
+                                            if (cell == lastView) {
+                                                self.tableView.reloadData()
+                                            }
+                    }
+                )
+                
+                delay += 0.03
+            }
+            
+            /* Once the cell to delete has been located, apply the animation to subsequent cells */
+            if cell.toDoItem === toDoItem {
+                startAnimating = true
+                cell.hidden = true
+            }
+        }
+        
+        // use the UITableView to animate the removal of this row
         tableView.beginUpdates()
         let indexPathForRow = NSIndexPath(forRow: index, inSection: 0)
-        tableView.deleteRowsAtIndexPaths([indexPathForRow], withRowAnimation: .Left)//.Fade)
+        tableView.deleteRowsAtIndexPaths([indexPathForRow], withRowAnimation: .Fade)
         tableView.endUpdates()
     }
-    
+
 }
