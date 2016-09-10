@@ -22,6 +22,9 @@ class CustomTableViewCell: UITableViewCell {
     var deleteOnDragRelease = false
     var completeOnDragRelease = false
     
+    var tickLabel: UILabel
+    var crossLabel: UILabel
+    
     let label: StrikethroughText
     var itemCompleteLayer = CALayer()
     
@@ -49,6 +52,23 @@ class CustomTableViewCell: UITableViewCell {
         label.font = UIFont.boldSystemFontOfSize(16)
         label.backgroundColor = UIColor.clearColor()
         
+        func createCueLabel() -> UILabel {
+            let label = UILabel(frame: CGRect.null)
+            label.textColor = UIColor.whiteColor()
+            label.font = UIFont.boldSystemFontOfSize(38.0)
+            label.backgroundColor = UIColor.clearColor()
+            return label
+        }
+        
+        /* Create contextual cues */
+        tickLabel = createCueLabel()
+        tickLabel.text = "\u{2713}"
+        tickLabel.textAlignment = .Right
+        
+        crossLabel = createCueLabel()
+        crossLabel.text = "\u{2421}" //"\u{2620}" // "\u{2717}"
+        crossLabel.textAlignment = .Left
+        
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         addSubview(label)
@@ -65,6 +85,10 @@ class CustomTableViewCell: UITableViewCell {
         gradientLayer.locations = [0.0, 0.005, 0.99, 1.0] //[0.0, 0.01, 0.95, 1.0]
         layer.insertSublayer(gradientLayer, atIndex: 0)
         
+        addSubview(tickLabel)
+
+        addSubview(crossLabel)
+        
         /* Create a green background when the user indicates that an item in the table is "complete" */
         itemCompleteLayer = CALayer(layer: layer)
         itemCompleteLayer.backgroundColor = UIColor(red: 0.0, green: 0.6, blue: 0.0,
@@ -79,6 +103,9 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     let kLabelLeftMargin: CGFloat = 15.0
+    let kUICuesMargin: CGFloat = 10.0
+    let kUICuesWidth: CGFloat = 50.0
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = bounds
@@ -86,7 +113,14 @@ class CustomTableViewCell: UITableViewCell {
         label.frame = CGRect(x: kLabelLeftMargin, y: 0,
                              width: bounds.size.width - kLabelLeftMargin,
                              height: bounds.size.height)
+        
+        /* Add the contextual cues, initially located off-screen */
+        tickLabel.frame = CGRect(x: -kUICuesWidth - kUICuesMargin, y: 0,
+                                 width: kUICuesWidth, height: bounds.size.height)
+        crossLabel.frame = CGRect(x: bounds.size.width + kUICuesMargin, y: 0,
+                                  width: kUICuesWidth, height: bounds.size.height)
     }
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -115,6 +149,7 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     // MARK: - Helpers
+    
     func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         
         if recognizer.state == .Began {
@@ -133,6 +168,17 @@ class CustomTableViewCell: UITableViewCell {
             
             /* If the gesture is has extended for more than half the width of the cell (RIGHT), cue the cell for deletion */
             completeOnDragRelease = frame.origin.x > frame.size.width / 2.0
+            
+            /* Create a fade effect for the contextual cues */
+            let cueAlpha = fabs(frame.origin.x) / (frame.size.width / 2.0)  // width will be constant; half of the width is the distance from the center of the cell to the edge; the x coordinate changes with the left/right gesture; fabs makes sense because the alpha level will be between 0 and 1
+            print("Frame width: \(frame.size.width)")
+            print("Frame origin: \(frame.origin)")
+            tickLabel.alpha = cueAlpha
+            crossLabel.alpha = cueAlpha
+            
+            /* Use color to indicate when a gesture has changed the state of the cell (delete or mark as complete) */
+            tickLabel.textColor = completeOnDragRelease ? UIColor.greenColor() : UIColor.whiteColor()
+            crossLabel.textColor = deleteOnDragRelease ? UIColor.redColor() : UIColor.whiteColor()
         }
         
         if recognizer.state == .Ended {
