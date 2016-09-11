@@ -14,6 +14,9 @@ class MainTableVC: UIViewController {
     
     var exampleData: [TableItem]!
     
+    let placeHolderCell = CustomTableViewCell(style: .Default, reuseIdentifier: "Cell")
+    var pullDownInProgress = false
+    
     // MARK: - Outlets
     
     @IBOutlet var tableView: UITableView!
@@ -89,16 +92,80 @@ extension MainTableVC: UITableViewDataSource, UITableViewDelegate {
         cell.backgroundColor = colorForCellByIndex(indexPath.row) // UIColor.clearColor()
     }
     
+}
+
+// MARK: - UIScrollViewDelegate methods
+
+extension MainTableVC {
     
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        
+        pullDownInProgress = scrollView.contentOffset.y <= 0.0
+        placeHolderCell.backgroundColor = UIColor.blueColor() //UIColor.redColor()
+        if pullDownInProgress {
+            /* User has pulled downward at the top of the table, add the placeholder cell */
+            tableView.insertSubview(placeHolderCell, atIndex: 0)
+        }
+    }
     
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        
+        let scrollViewContentOffsetY = scrollView.contentOffset.y
+        
+        if pullDownInProgress && scrollView.contentOffset.y <= 0.0 {
+            /* Re-position the placeholder cell as the user scrolls */
+            placeHolderCell.frame = CGRect(x: 0, y: -tableView.rowHeight,
+                                           width: tableView.frame.size.width, height: tableView.rowHeight)
+            placeHolderCell.label.text = -scrollViewContentOffsetY > tableView.rowHeight ?
+                "Release to add item" : "Pull to add item"
+            placeHolderCell.alpha = min(1.0, -scrollViewContentOffsetY / tableView.rowHeight)
+        } else {
+            pullDownInProgress = false
+        }
+    }
+    
+    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        
+        /* If the scroll-down gesture was far enough, add the placeholder cell to the collection of items in the table view */
+        if pullDownInProgress && -scrollView.contentOffset.y > tableView.rowHeight {
+            
+            if pullDownInProgress && -scrollView.contentOffset.y > tableView.rowHeight {
+                toDoItemAdded()
+            }
+        }
+        pullDownInProgress = false
+        placeHolderCell.removeFromSuperview()
+    }
+
 }
 
 extension MainTableVC: TableViewCellDelegate {
     
+    /* Add a cell */
+    func toDoItemAdded() {
+        
+        let toDoItem = TableItem(text: "")
+        exampleData.insert(toDoItem, atIndex: 0)
+        tableView.reloadData()
+        
+        /* Put the new cell into edit mode */
+        var editCell: CustomTableViewCell
+        let visibleCells = tableView.visibleCells as! [CustomTableViewCell]
+        for cell in visibleCells {
+            if (cell.toDoItem === toDoItem) {
+                
+                editCell = cell
+                editCell.backgroundColor = UIColor.cyanColor()
+                editCell.label.becomeFirstResponder()
+                break
+            }
+        }
+    }
+    
     /* Delete a cell */
     func toDoItemDeleted(toDoItem: TableItem) {
         
-        /* Delete using stock animations */
+        /* Delete using stock animations only */
         //        let index = (exampleData as NSArray).indexOfObject(toDoItem)
         //        if index == NSNotFound { return }
         //
@@ -164,6 +231,46 @@ extension MainTableVC: TableViewCellDelegate {
         let indexPathForRow = NSIndexPath(forRow: index, inSection: 0)
         tableView.deleteRowsAtIndexPaths([indexPathForRow], withRowAnimation: .Fade)
         tableView.endUpdates()
+    }
+
+    func cellDidBeginEditing(editingCell: CustomTableViewCell) {
+        
+        print("tableView.contentOffset: \(tableView.contentOffset)")
+        
+        /* Capture the distance to the VISIBLE top of the table view (i.e. include the scroll position = contentOffset)*/
+        let editingOffset = tableView.contentOffset.y - editingCell.frame.origin.y as CGFloat
+        
+        let visibleCells = tableView.visibleCells as! [CustomTableViewCell]
+        
+        for cell in visibleCells {
+            UIView.animateWithDuration(0.3, animations: {() in
+                /* Moves the cell up relative to the scroll position of the table view */
+                cell.transform = CGAffineTransformMakeTranslation(0, editingOffset)
+                if cell !== editingCell {
+                    cell.alpha = 0.3
+                }
+            })
+        }
+    }
+    
+    func cellDidEndEditing(editingCell: CustomTableViewCell) {
+        
+        let visibleCells = tableView.visibleCells as! [CustomTableViewCell]
+        
+        for cell: CustomTableViewCell in visibleCells {
+            UIView.animateWithDuration(0.3, animations: {() in
+                /* A slick way to return the cell to its original spot */
+                cell.transform = CGAffineTransformIdentity
+                if cell !== editingCell {
+                    cell.alpha = 1.0
+                }
+            })
+        }
+        
+        /* Remove cells that the user leaves blank */
+        if editingCell.toDoItem!.cellText == "" {
+            toDoItemDeleted(editingCell.toDoItem!)
+        }
     }
 
 }

@@ -9,7 +9,7 @@
 import UIKit
 import QuartzCore
 
-class StrikethroughText: UILabel {
+class StrikethroughText: UITextField {
 
     let strikeThroughLayer: CALayer
     
@@ -43,7 +43,7 @@ class StrikethroughText: UILabel {
     
     let kStrikeOutThickness: CGFloat = 2.0
     func resizeStrikeThrough() {
-        let textSize = text!.sizeWithAttributes([NSFontAttributeName:font])
+        let textSize = text!.sizeWithAttributes([NSFontAttributeName:font!])
         strikeThroughLayer.frame = CGRect(x: 0, y: bounds.size.height/2,
                                           width: textSize.width, height: kStrikeOutThickness)
     }

@@ -64,11 +64,11 @@
 		4E4471F51D8222A800C87732 /* TouchesGaloreTable */ = {
 			isa = PBXGroup;
 			children = (
+				4E4471F61D8222A800C87732 /* AppDelegate.swift */,
 				4E4472111D83090100C87732 /* View */,
 				4E44720E1D826F4200C87732 /* Services */,
 				4E44720B1D8223E000C87732 /* Model */,
 				4E4472081D8222EF00C87732 /* Controller */,
-				4E4471F61D8222A800C87732 /* AppDelegate.swift */,
 				4E4471F81D8222A800C87732 /* ViewController.swift */,
 				4E4471FA1D8222A800C87732 /* Main.storyboard */,
 				4E4471FD1D8222A800C87732 /* Assets.xcassets */,
@@ -339,6 +339,7 @@
 				4E4472071D8222A800C87732 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

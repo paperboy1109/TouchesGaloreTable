@@ -12,6 +12,10 @@ import UIKit
 
 protocol TableViewCellDelegate {
     func toDoItemDeleted(todoItem: TableItem)
+    
+    /* Lifecycle methods */
+    func cellDidBeginEditing(editingCell: CustomTableViewCell)
+    func cellDidEndEditing(editingCell: CustomTableViewCell)
 }
 
 
@@ -19,6 +23,7 @@ class CustomTableViewCell: UITableViewCell {
     
     let gradientLayer = CAGradientLayer()
     var originalCenter = CGPoint()
+    
     var deleteOnDragRelease = false
     var completeOnDragRelease = false
     
@@ -70,6 +75,10 @@ class CustomTableViewCell: UITableViewCell {
         crossLabel.textAlignment = .Left
         
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        /* Configure the cell labels */
+        label.delegate = self
+        label.contentVerticalAlignment = .Center
         
         addSubview(label)
         
@@ -149,7 +158,7 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     // MARK: - Helpers
-    
+
     func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         
         if recognizer.state == .Began {
@@ -206,7 +215,38 @@ class CustomTableViewCell: UITableViewCell {
     }
 }
 
-extension CustomTableViewCell {
+extension CustomTableViewCell: UITextFieldDelegate {
     
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
+    }
+    
+    /* If marked as complete, don't let the user make any edits to the text */
+    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {        
+        if toDoItem != nil {
+            return !toDoItem!.completed
+        }
+        return false
+    }
+    
+    /* Invoke the lifecycle protocol: cellDidBeginEditing */
+    func textFieldDidBeginEditing(textField: UITextField) {
+        if delegate != nil {
+            delegate!.cellDidBeginEditing(self)
+        }
+    }
+    
+    /* Invoke the lifecycle protocol: cellDidEndEditing */
+    func textFieldDidEndEditing(textField: UITextField) {
+        if toDoItem != nil {
+            toDoItem!.cellText = textField.text!
+        }
+        
+        if delegate != nil {
+            delegate!.cellDidEndEditing(self)
+        }
+    }
+
     
 }
